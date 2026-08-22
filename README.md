@@ -629,3 +629,6 @@ Java Backend Developer
 
 Technologies: Java | Spring Boot | Spring Security | REST APIs | JPA/Hibernate | MySQL | Docker
 
+License
+
+This project is intended for educational and portfolio purposes.
