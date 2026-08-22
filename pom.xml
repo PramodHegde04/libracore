@@ -13,11 +13,11 @@
 	</parent>
 
 	<groupId>com.pramod</groupId>
-	<artifactId>library-management-system</artifactId>
+	<artifactId>libracore</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-	<name>library-management-system</name>
-	<description>Library Management System</description>
+	<name>LibraCore</name>
+	<description>Secure Library Management and Lending Platform</description>
 
 	<properties>
 		<java.version>17</java.version>
