@@ -391,32 +391,6 @@ BookIssue
 
 Stores issue ID, user, book, issue date, return date, and issue status.
 
-Project Structure
-
-libracore/
-├── src/
-│   ├── main/
-│   │   ├── java/com/pramod/library/
-│   │   │   ├── config/
-│   │   │   ├── controller/
-│   │   │   ├── dto/
-│   │   │   ├── entity/
-│   │   │   ├── exception/
-│   │   │   ├── mapper/
-│   │   │   ├── repository/
-│   │   │   ├── security/
-│   │   │   └── service/
-│   │   └── resources/
-│   │       └── application.properties
-│   └── test/
-│       └── java/com/pramod/library/
-├── Dockerfile
-├── docker-compose.yml
-├── pom.xml
-├── mvnw
-├── mvnw.cmd
-├── .gitignore
-└── README.md
 
 Docker
 
