@@ -105,33 +105,43 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/auth/**")
-                        .permitAll()
+                        // ==============================
+                        // PUBLIC ENDPOINTS
+                        // ==============================
+
+                        .requestMatchers(
+                                "/auth/register",
+                                "/auth/login"
+                        ).permitAll()
 
                         .requestMatchers(
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
-                        )
-                        .permitAll()
+                        ).permitAll()
+
+                        // ==============================
+                        // ADMIN ENDPOINTS
+                        // ==============================
 
                         .requestMatchers(
                                 org.springframework.http.HttpMethod.POST,
                                 "/books"
-                        )
-                        .hasRole("ADMIN")
+                        ).hasRole("ADMIN")
 
                         .requestMatchers(
                                 org.springframework.http.HttpMethod.PUT,
                                 "/books/**"
-                        )
-                        .hasRole("ADMIN")
+                        ).hasRole("ADMIN")
 
                         .requestMatchers(
                                 org.springframework.http.HttpMethod.DELETE,
                                 "/books/**"
-                        )
-                        .hasRole("ADMIN")
+                        ).hasRole("ADMIN")
+
+                        // ==============================
+                        // EVERYTHING ELSE
+                        // ==============================
 
                         .anyRequest()
                         .authenticated()
