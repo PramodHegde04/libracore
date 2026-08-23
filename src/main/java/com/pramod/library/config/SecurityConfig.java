@@ -12,13 +12,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 @Configuration
@@ -34,22 +38,30 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration)
-            throws Exception {
+            AuthenticationConfiguration configuration) throws Exception {
 
         return configuration.getAuthenticationManager();
     }
 
     @Bean
-    public JwtDecoder jwtDecoder() {
-
-        SecretKey secretKey = new SecretKeySpec(
-                jwtSecret.getBytes(),
+    public SecretKey jwtSecretKey() {
+        return new SecretKeySpec(
+                jwtSecret.getBytes(StandardCharsets.UTF_8),
                 "HmacSHA256"
         );
+    }
 
+    @Bean
+    public JwtEncoder jwtEncoder(SecretKey jwtSecretKey) {
+        return new NimbusJwtEncoder(
+                new ImmutableSecret<>(jwtSecretKey)
+        );
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder(SecretKey jwtSecretKey) {
         return NimbusJwtDecoder
-                .withSecretKey(secretKey)
+                .withSecretKey(jwtSecretKey)
                 .macAlgorithm(MacAlgorithm.HS256)
                 .build();
     }
@@ -69,9 +81,7 @@ public class SecurityConfig {
             }
 
             return Collections.singletonList(
-                    new SimpleGrantedAuthority(
-                            "ROLE_" + role
-                    )
+                    new SimpleGrantedAuthority("ROLE_" + role)
             );
         });
 
@@ -80,7 +90,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(
-            HttpSecurity http)
+            HttpSecurity http,
+            JwtAuthenticationConverter jwtAuthenticationConverter)
             throws Exception {
 
         http
@@ -94,38 +105,42 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers(
-                                "/auth/**"
-                        ).permitAll()
+                        .requestMatchers("/auth/**")
+                        .permitAll()
 
                         .requestMatchers(
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
-                        ).permitAll()
+                        )
+                        .permitAll()
 
                         .requestMatchers(
                                 org.springframework.http.HttpMethod.POST,
                                 "/books"
-                        ).hasRole("ADMIN")
+                        )
+                        .hasRole("ADMIN")
 
                         .requestMatchers(
                                 org.springframework.http.HttpMethod.PUT,
                                 "/books/**"
-                        ).hasRole("ADMIN")
+                        )
+                        .hasRole("ADMIN")
 
                         .requestMatchers(
                                 org.springframework.http.HttpMethod.DELETE,
                                 "/books/**"
-                        ).hasRole("ADMIN")
+                        )
+                        .hasRole("ADMIN")
 
-                        .anyRequest().authenticated()
+                        .anyRequest()
+                        .authenticated()
                 )
 
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt ->
                                 jwt.jwtAuthenticationConverter(
-                                        jwtAuthenticationConverter()
+                                        jwtAuthenticationConverter
                                 )
                         )
                 );

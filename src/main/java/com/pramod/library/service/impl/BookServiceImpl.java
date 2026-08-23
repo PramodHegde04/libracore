@@ -4,7 +4,6 @@ import com.pramod.library.entity.Book;
 import com.pramod.library.exception.BookNotFoundException;
 import com.pramod.library.repository.BookRepository;
 import com.pramod.library.service.BookService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,11 +13,17 @@ import java.util.List;
 @Service
 public class BookServiceImpl implements BookService {
 
-    @Autowired
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
+
+    public BookServiceImpl(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
 
     @Override
     public Book saveBook(Book book) {
+
+        validateInventory(book);
+
         return bookRepository.save(book);
     }
 
@@ -55,6 +60,8 @@ public class BookServiceImpl implements BookService {
                                 "Book not found with id: " + id
                         ));
 
+        validateInventory(book);
+
         existingBook.setTitle(book.getTitle());
         existingBook.setAuthor(book.getAuthor());
         existingBook.setIsbn(book.getIsbn());
@@ -75,5 +82,21 @@ public class BookServiceImpl implements BookService {
                         ));
 
         bookRepository.delete(existingBook);
+    }
+
+    private void validateInventory(Book book) {
+
+        if (book.getTotalCopies() == null ||
+                book.getAvailableCopies() == null) {
+            throw new IllegalArgumentException(
+                    "Total copies and available copies are required"
+            );
+        }
+
+        if (book.getAvailableCopies() > book.getTotalCopies()) {
+            throw new IllegalArgumentException(
+                    "Available copies cannot exceed total copies"
+            );
+        }
     }
 }
