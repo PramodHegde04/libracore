@@ -6,7 +6,6 @@ The application uses JWT authentication, role-based authorization, Spring Data J
 
 ## Live Deployment
 
-- **Production API:** https://libracore-5yzm.onrender.com
 - **Swagger UI:** https://libracore-5yzm.onrender.com/swagger-ui/index.html
 - **GitHub Repository:** https://github.com/PramodHegde04/libracore
 
@@ -399,7 +398,6 @@ libracore/
 ## Links
 
 - **GitHub:** https://github.com/PramodHegde04/libracore
-- **Live API:** https://libracore-5yzm.onrender.com
 - **Swagger UI:** https://libracore-5yzm.onrender.com/swagger-ui/index.html
 
 
