@@ -1,17 +1,16 @@
-# LibraCore
+# LibraCore – Library Management System
 
-## Library Management System
+**LibraCore** is a RESTful Library Management System built using Java 17 and Spring Boot. It provides secure APIs for user authentication, book management, and book issue/return operations.
 
-LibraCore is a RESTful Library Management System built with **Java 17** and **Spring Boot**. It provides secure APIs for user authentication, book management, and book issue/return operations.
-
-The application uses JWT authentication, role-based authorization, Spring Data JPA/Hibernate, and MySQL. It is containerized with Docker and deployed to Railway.
+The application uses JWT authentication, role-based authorization, Spring Data JPA, Hibernate, and MySQL. It is containerized using Docker and deployed on Render with a managed MySQL database hosted on Aiven.
 
 ## Live Deployment
 
-- **Production API:** https://libracore-production.up.railway.app
-- **Swagger UI:** https://libracore-production.up.railway.app/swagger-ui/index.html
+- **Production API:** https://libracore-5yzm.onrender.com
+- **Swagger UI:** https://libracore-5yzm.onrender.com/swagger-ui/index.html
+- **GitHub Repository:** https://github.com/PramodHegde04/libracore
 
-> The production root URL is a backend REST API and is not intended to display a web page. Swagger UI is the recommended interface for exploring and testing the API.
+The production root URL is a REST API endpoint and is not intended to display a web page. Swagger UI is the recommended interface for exploring and testing the API.
 
 ## Features
 
@@ -25,8 +24,8 @@ The application uses JWT authentication, role-based authorization, Spring Data J
 
 ### Book Management
 - Create, read, update, and delete books
-- Get books by ID
-- Pagination
+- Retrieve books by ID
+- Pagination support
 - Book categories
 - Total-copy and available-copy tracking
 
@@ -39,9 +38,10 @@ The application uses JWT authentication, role-based authorization, Spring Data J
 
 ### Deployment & Documentation
 - Docker and Docker Compose
-- MySQL 8
-- Railway deployment
-- OpenAPI / Swagger UI
+- MySQL 8+
+- Render cloud deployment
+- Aiven managed MySQL database
+- OpenAPI / Swagger documentation
 - Environment-based production configuration
 - HTTPS production endpoint
 
@@ -49,46 +49,66 @@ The application uses JWT authentication, role-based authorization, Spring Data J
 
 | Technology | Purpose |
 |---|---|
-| Java 17 | Backend language |
+| Java 17 | Backend programming language |
 | Spring Boot | Application framework |
 | Spring Security | Authentication and authorization |
 | JWT | Stateless authentication |
 | Spring Data JPA | Database access |
 | Hibernate | ORM |
-| MySQL 8 | Relational database |
+| MySQL 8+ | Relational database |
 | Maven | Build and dependency management |
-| Docker | Containerization |
-| Docker Compose | Local environment |
+| Docker | Application containerization |
+| Docker Compose | Local development environment |
 | OpenAPI / Swagger | API documentation |
-| Railway | Cloud deployment |
+| Render | Backend cloud hosting |
+| Aiven | Managed MySQL database hosting |
+| Git & GitHub | Version control and source code management |
 
 ## Architecture
 
 ```text
-                         Client
-                           |
-                           v
-                    Swagger UI / REST
-                           |
-                           v
-                  Spring Boot Application
-                           |
-              +------------+------------+
-              |                         |
-              v                         v
-       Spring Security             Controllers
-              |                         |
-              v                         v
-             JWT                  Service Layer
-                                        |
-                                        v
-                                Repository Layer
-                                        |
-                                        v
-                                  MySQL Database
+                  Client
+                    |
+                    v
+             Swagger UI / REST
+                    |
+                    v
+           Spring Boot Application
+                    |
+          +---------+---------+
+          |                   |
+          v                   v
+    Spring Security       Controllers
+          |                   |
+          v                   v
+         JWT              Service Layer
+                              |
+                              v
+                       Repository Layer
+                              |
+                              v
+                         MySQL Database
 ```
 
-## REST API
+### Production Deployment Architecture
+
+```text
+                 Internet
+                    |
+                    v
+              Render HTTPS
+                    |
+                    v
+            Spring Boot API
+             Java 17 / Docker
+                    |
+                    | JDBC + SSL
+                    v
+              Aiven MySQL
+              Managed Database
+```
+
+## REST API Endpoints
 
 ### Authentication
 
@@ -124,13 +144,13 @@ Client
 Spring Boot
   |
   v
-Validate credentials
+Validate Credentials
   |
   v
 Generate JWT
   |
   v
-Client receives token
+Client Receives Token
   |
   | Authorization: Bearer <JWT>
   v
@@ -140,56 +160,66 @@ Spring Security
 Protected API
 ```
 
-## Book Issue & Return
+## Book Issue & Return Workflow
 
 When a book is issued, its available-copy count decreases.
 
 ```text
-5 total / 5 available
+5 Total / 5 Available
           |
         ISSUE
+          |
           v
-5 total / 4 available
+5 Total / 4 Available
 ```
 
-When it is returned:
+When the book is returned:
 
 ```text
-5 total / 4 available
+5 Total / 4 Available
           |
         RETURN
+          |
           v
-5 total / 5 available
+5 Total / 5 Available
 ```
 
 ## Database
 
-The application uses MySQL with Spring Data JPA and Hibernate.
+LibraCore uses MySQL with Spring Data JPA and Hibernate.
 
 Main domain tables include:
 
-```text
-users
-books
-book_issues
-```
+- `users`
+- `books`
+- `book_issues`
 
-For the local Docker environment, MySQL is exposed on port `3307` and the application connects to the MySQL container over the Docker network.
+### Production Database
+
+The production database is hosted on Aiven MySQL.
+
+The application connects to the database using JDBC and environment-based configuration. SSL is enabled for secure database communication.
+
+### Local Database
+
+For local Docker development, MySQL runs in a Docker container and is accessible through the Docker network.
+
+The local MySQL port is configured separately from the production database.
 
 ## Configuration
 
-Production configuration is supplied through environment variables.
+Production configuration is managed through environment variables.
 
-Typical variables:
+| Environment Variable | Description |
+|---|---|
+| `DB_URL` | MySQL JDBC connection URL |
+| `DB_USERNAME` | Database username |
+| `DB_PASSWORD` | Database password |
+| `JWT_SECRET` | Secret used for JWT signing and verification |
+| `PORT` | Application server port |
+| `APP_BASE_URL` | Public application URL |
 
-```text
-DB_USERNAME
-DB_PASSWORD
-JWT_SECRET
-PORT
-```
-
-Never commit real database credentials, JWT secrets, API keys, or other sensitive values to Git.
+**Security:** Never commit real database credentials, JWT secrets, API keys, or other sensitive information to GitHub.
 
 ## Run Locally
 
@@ -198,17 +228,17 @@ Never commit real database credentials, JWT secrets, API keys, or other sensitiv
 - Java 17
 - Git
 - Docker Desktop
+- Maven (optional, as the project includes Maven Wrapper)
 
-The project includes the Maven Wrapper.
-
-### Clone
+### Clone Repository
 
 ```bash
 git clone https://github.com/PramodHegde04/libracore.git
+
 cd libracore
 ```
 
-### Docker Compose
+### Run Using Docker Compose
 
 ```bash
 docker compose up --build
@@ -220,21 +250,21 @@ Application:
 http://localhost:8080
 ```
 
-Swagger:
+Swagger UI:
 
 ```text
 http://localhost:8080/swagger-ui/index.html
 ```
 
-### Run with Maven
+### Run Using Maven
 
-Windows:
+**Windows:**
 
 ```powershell
 .\mvnw.cmd spring-boot:run
 ```
 
-Linux/macOS:
+**Linux/macOS:**
 
 ```bash
 ./mvnw spring-boot:run
@@ -242,13 +272,15 @@ Linux/macOS:
 
 ## Testing
 
-Windows:
+Run the test suite using Maven Wrapper.
+
+**Windows:**
 
 ```powershell
 .\mvnw.cmd clean test
 ```
 
-Linux/macOS:
+**Linux/macOS:**
 
 ```bash
 ./mvnw clean test
@@ -259,18 +291,18 @@ The project includes application, authentication, book integration, and security
 ## Docker Architecture
 
 ```text
-+------------------------+
-|   LibraCore App        |
-|   Spring Boot / Java17 |
-|   Port 8080            |
-+-----------+------------+
-            |
-            | JDBC
-            v
-+------------------------+
-|       MySQL 8          |
-|      Port 3306         |
-+------------------------+
++--------------------------+
+|       LibraCore App      |
+|    Spring Boot / Java 17 |
+|        Port 8080         |
++------------+-------------+
+             |
+             | JDBC
+             v
++--------------------------+
+|         MySQL 8          |
+|      Port 3306           |
++--------------------------+
 ```
 
 The Dockerfile uses a multi-stage build:
@@ -282,7 +314,7 @@ Maven + JDK 17
 Build Spring Boot JAR
       |
       v
-Java 17 JRE image
+Java 17 JRE Image
       |
       v
 Run app.jar
@@ -290,64 +322,50 @@ Run app.jar
 
 ## Production Deployment
 
-LibraCore is deployed on Railway.
+LibraCore is deployed using Render and Aiven.
+
+### Deployment Platforms
+
+- **Render:** Hosts the Spring Boot application using Docker.
+- **Aiven:** Hosts the managed MySQL production database.
+- **GitHub:** Stores the source code and triggers deployments when configured changes are pushed.
+
+### Production Request Flow
 
 ```text
 Internet
    |
    v
-Railway HTTPS
+Render HTTPS
    |
    v
-LibraCore API
+LibraCore Spring Boot API
    |
+   | JDBC Connection
    v
-Railway MySQL
+Aiven MySQL Database
 ```
 
-Production secrets and configuration are supplied through Railway environment variables rather than committed to the repository.
+Production secrets and configuration are supplied through Render environment variables rather than committed to the repository.
 
-## Swagger Testing Flow
+## Swagger API Testing
 
-Open:
+Open the live API documentation:
 
-https://libracore-production.up.railway.app/swagger-ui/index.html
+https://libracore-5yzm.onrender.com/swagger-ui/index.html
 
-Recommended sequence:
+Recommended testing sequence:
 
-```text
-1. Register a user
-2. Login
-3. Copy the JWT
-4. Authorize in Swagger
-5. Test GET /books
-6. Create a book
-7. Issue the book
-8. Verify availableCopies
-9. Return the book
-10. Verify availableCopies again
-```
-
-## Production Verification
-
-The deployed application has been verified for:
-
-- Registration
-- Login
-- JWT generation
-- JWT authentication
-- ADMIN authorization
-- MEMBER authorization
-- Book creation
-- Book retrieval
-- Book update
-- Book deletion
-- Book issue
-- Book return
-- Available-copy updates
-- MySQL persistence
-- Swagger API testing
-- HTTPS production access
+1. Register a user.
+2. Login using the registered credentials.
+3. Copy the generated JWT.
+4. Authorize in Swagger.
+5. Test `GET /books`.
+6. Create a book.
+7. Issue the book.
+8. Verify `availableCopies`.
+9. Return the book.
+10. Verify `availableCopies` again.
 
 ## Project Structure
 
@@ -381,8 +399,9 @@ libracore/
 ## Links
 
 - **GitHub:** https://github.com/PramodHegde04/libracore
-- **Production API:** https://libracore-production.up.railway.app
-- **Swagger UI:** https://libracore-production.up.railway.app/swagger-ui/index.html
+- **Live API:** https://libracore-5yzm.onrender.com
+- **Swagger UI:** https://libracore-5yzm.onrender.com/swagger-ui/index.html
+
 
 ## Author
 
